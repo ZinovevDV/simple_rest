@@ -9,7 +9,10 @@ import java.util.UUID;
 public interface TaskRepository {
     List<Task> findAll();
 
+    List<Task> findAllByApplicationUserId(UUID uuid);
     void save(Task task);
 
     Optional<Task> findById(UUID id);
+
+
 }

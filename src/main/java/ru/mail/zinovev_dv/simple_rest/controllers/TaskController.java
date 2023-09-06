@@ -4,9 +4,12 @@ import lombok.AllArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import ru.mail.zinovev_dv.simple_rest.Errors.ErrorsData;
+import ru.mail.zinovev_dv.simple_rest.Security.ApplicationUser;
 import ru.mail.zinovev_dv.simple_rest.dto.Task;
 import ru.mail.zinovev_dv.simple_rest.dto.TaskNew;
 import ru.mail.zinovev_dv.simple_rest.repository.TaskRepository;
@@ -34,6 +37,7 @@ public class TaskController {
     }
 
     @PostMapping
+    @Transactional
     public ResponseEntity<?> addTask(@RequestBody TaskNew task,
                                      UriComponentsBuilder uriComponentsBuilder,
                                      Locale locale){
@@ -60,5 +64,13 @@ public class TaskController {
     @GetMapping("{id}")
     public ResponseEntity<Task> findTask(@PathVariable("id") UUID id){
         return ResponseEntity.of(this.taskRepository.findById(id));
+    }
+
+    @GetMapping("/myTask")
+    public ResponseEntity<List<Task>> getAllMyTasks(@AuthenticationPrincipal ApplicationUser user){
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(this.taskRepository.findAllByApplicationUserId(user.id()));
+
     }
 }
